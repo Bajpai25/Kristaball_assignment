@@ -65,8 +65,8 @@ model Purchase {
 
 model Transfer {
   id          String   @id @default(uuid())
-  assetType   AssetType @relation(fields: [assetTypeId], references: [id])
-  assetTypeId String
+  assetType   AssetType @relation(fields: [assetId], references: [id])
+  assetId String
 
   fromBase   Base @relation("TransfersFrom", fields: [fromBaseId], references: [id])
   fromBaseId String
@@ -80,8 +80,8 @@ model Transfer {
 
 model Assignment {
   id          String   @id @default(uuid())
-  assetType   AssetType @relation(fields: [assetTypeId], references: [id])
-  assetTypeId String
+  assetType   AssetType @relation(fields: [assetId], references: [id])
+  assetId String
 
   personnelId String
   assignedAt  DateTime @default(now())

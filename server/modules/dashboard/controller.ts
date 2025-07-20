@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const getDashboard = async (_req: Request, res: Response) => {
   // Example aggregated query
-  const totalAssets = await prisma.asset.count();
+  const totalAssets = await prisma.assetType.count();
   const totalBases = await prisma.base.count();
   res.json({ totalAssets, totalBases });
 };
