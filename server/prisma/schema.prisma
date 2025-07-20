@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+enum Role {
+  ADMIN
+  COMMANDER
+  LOGISTICS_OFFICER
+}
+
+model Base {
+  id        String   @id @default(uuid())
+  name      String
+  location  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchases     Purchase[]
+  transfersFrom Transfer[] @relation("TransfersFrom")
+  transfersTo   Transfer[] @relation("TransfersTo")
+  expenditures  Expenditure[]
+}
+
+model AssetType {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchases     Purchase[]
+  transfers     Transfer[]
+  assignments   Assignment[]
+  expenditures  Expenditure[]
+}
+
+model Purchase {
+  id        String   @id @default(uuid())
+  assetType AssetType @relation(fields: [assetId], references: [id])
+  assetId String
+
+  base     Base   @relation(fields: [baseId], references: [id])
+  baseId   String
+
+  quantity Int
+  date     DateTime @default(now())
+}
+
+model Transfer {
+  id          String   @id @default(uuid())
+  assetType   AssetType @relation(fields: [assetTypeId], references: [id])
+  assetTypeId String
+
+  fromBase   Base @relation("TransfersFrom", fields: [fromBaseId], references: [id])
+  fromBaseId String
+
+  toBase     Base @relation("TransfersTo", fields: [toBaseId], references: [id])
+  toBaseId   String
+
+  quantity Int
+  date     DateTime @default(now())
+}
+
+model Assignment {
+  id          String   @id @default(uuid())
+  assetType   AssetType @relation(fields: [assetTypeId], references: [id])
+  assetTypeId String
+
+  personnelId String
+  assignedAt  DateTime @default(now())
+}
+
+model Expenditure {
+  id          String   @id @default(uuid())
+  assetType   AssetType @relation(fields: [assetId], references: [id])
+  assetId String
+
+  base     Base   @relation(fields: [baseId], references: [id])
+  baseId   String
+
+  quantity Int
+  date     DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  action    String
+  createdAt DateTime @default(now())
+}
